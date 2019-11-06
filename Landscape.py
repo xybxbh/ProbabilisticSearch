@@ -1,5 +1,7 @@
 import random
 from Cell import *
+
+
 class Landscape(object):
     def __init__(self):
         self.dim = 50
@@ -10,10 +12,10 @@ class Landscape(object):
         self.env[target_x][target_y].set_target()
         
     def gen_landscape(self, p_flat, p_hilly, p_forest, p_cave):
-        p = random.random()
         landscape = [['0' for col in range(self.dim)] for row in range(self.dim)]
         for i in range(self.dim):
             for j in range(self.dim):
+                p = random.random()
                 if p < p_flat:
                     landscape[i][j] = Cell('flat')
                 elif p < p_flat + p_hilly:

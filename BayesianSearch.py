@@ -1,5 +1,6 @@
 from Landscape import *
 
+
 class BayesianSearch(object):
     def __init__(self, landscape):
         self.landscape = landscape
@@ -16,5 +17,5 @@ class BayesianSearch(object):
                         if i == x and j == y:
                             pass    # update (x, y) at last
                         else:
-                            self.landscape[i][j].update_belief(1/(cell.belief[-1]*cell.fn+1-cell.belief[-1]))
-                        cell.update_belief(cell.fn/(cell.belief[-1]*cell.fn+1-cell.belief[-1]))
+                            self.landscape[i][j].update_belief(1 / (cell.belief[-1] * cell.fn + 1 - cell.belief[-1]))
+                        cell.update_belief(cell.fn / (cell.belief[-1] * cell.fn + 1 - cell.belief[-1]))

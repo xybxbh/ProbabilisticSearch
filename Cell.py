@@ -1,6 +1,7 @@
 import random
 
-class cell(object):
+
+class Cell(object):
     def __init__(self, type):
         self.type = type
         self.fn = self.false_negative(0.1, 0.3, 0.7, 0.9)
@@ -19,7 +20,7 @@ class cell(object):
             return fn_cave
 
     def update_belief(self, coefficient):
-        self.belief.append(belief[-1]*coefficient)
+        self.belief.append(self.belief[-1] * coefficient)
 
     def set_target(self):
         self.target = True
@@ -32,4 +33,3 @@ class cell(object):
             return False
         else:
             return True
-    
