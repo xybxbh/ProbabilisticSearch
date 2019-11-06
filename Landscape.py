@@ -1,7 +1,5 @@
 import random
 from Cell import *
-
-
 class Landscape(object):
     def __init__(self):
         self.dim = 50
