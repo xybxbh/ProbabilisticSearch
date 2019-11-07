@@ -1,4 +1,6 @@
 from Landscape import *
+import math
+from decimal import *
 
 class BayesianSearch(object):
     def __init__(self, landscape):
@@ -11,8 +13,8 @@ class BayesianSearch(object):
                 (x, y) = self.landscape.get_cell_with_highest_belief()
             if rule == 2:
                 (x, y) = self.landscape.get_cell_with_highest_p_of_finding()
-            print(x, y)
-            print(self.landscape.env[x][y].belief)
+            # print(x, y)
+            # print(self.landscape.env[x][y].belief)
             cell = self.landscape.env[x][y]
             if cell.search_cell():
                 count += 1
@@ -23,8 +25,14 @@ class BayesianSearch(object):
                         if i == x and j == y:
                             pass    # update (x, y) at last
                         else:
-                            self.landscape.env[i][j].update_belief(1/(cell.belief[-1]*cell.fn+1-cell.belief[-1]))
-                        cell.update_belief(cell.fn/(cell.belief[-1]*cell.fn+1-cell.belief[-1]))
+                            # print((i, j), (x, y))
+                            # print(cell.belief)
+                            # print(cell.fn)
+                            # print(cell.belief[-1]*(1-cell.fn))
+                            # print(Decimal(1)-Decimal(cell.belief[-1]*(1-cell.fn)))
+                            # print(1/(1-cell.belief[-1]*(1-cell.fn)))
+                            self.landscape.env[i][j].update_belief(1/(1-cell.belief[-1]*(1-cell.fn)))
+                cell.update_belief(cell.fn/(cell.belief[-1]*cell.fn+1-cell.belief[-1]))
                 count += 1
 
 if __name__ == '__main__':
@@ -38,7 +46,7 @@ if __name__ == '__main__':
         total_rule1_count += rule1_count
 
         for i in range(landscape.dim):
-            for j in landscape.dim:
+            for j in range(landscape.dim):
                 landscape.env[i][j].reset_belief()
         (x, y), rule2_count = bs.search(2)
         total_rule2_count += rule2_count
