@@ -25,6 +25,22 @@ class Landscape(object):
         return landscape
 
     def get_cell_with_highest_belief(self):
+        current_belief = []
+        for i in range(self.dim):
+            for j in range(self.dim):
+                current_belief.append(self.env[i][j].belief[-1])
+        index = current_belief.index(max(current_belief))
+        return (index // self.dim, index % self.dim)
+
+    def get_cell_with_highest_p_of_finding(self):
+        current_pfind = []
+        for i in range(self.dim):
+            for j in range(self.dim):
+                current_pfind.append(self.env[i][j].belief[-1]*(1-self.env[i][j].fn))
+        index = current_pfind.index(max(current_pfind))
+        return (index // self.dim, index % self.dim)
+
+    def get_cell_with_highest_belief_rand(self):
         current_belief = {}
         for i in range(self.dim):
             for j in range(self.dim):
@@ -33,7 +49,7 @@ class Landscape(object):
         index = random.sample(indices, 1)[0]
         return index
 
-    def get_cell_with_highest_p_of_finding(self):
+    def get_cell_with_highest_p_of_finding_rand(self):
         current_pfind = {}
         for i in range(self.dim):
             for j in range(self.dim):
