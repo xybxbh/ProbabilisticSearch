@@ -147,3 +147,19 @@ class Landscape(object):
                             neighbor_belif = dist_belief_matrix[x+i][y+j]
                             (next_x, next_y) = (x+i, y+j)
         return (next_x, next_y)
+
+    def target_move(self):
+        (target_x, target_y) = self.target_index
+        next_location = []
+        if target_x - 1 >= 0:
+            next_location.append((target_x - 1, target_y))
+        if target_x + 1 <= self.dim - 1:
+            next_location.append((target_x + 1, target_y))
+        if target_y - 1 >= 0:
+            next_location.append((target_x, target_y - 1))
+        if target_y + 1 <= self.dim - 1:
+            next_location.append((target_x, target_y + 1))
+        (n_target_x, n_target_y) = random.choice(next_location)
+        self.env[target_x][target_y].remove_target()
+        self.env[n_target_x][n_target_y].set_target()
+        self.target_index = (n_target_x, n_target_y)

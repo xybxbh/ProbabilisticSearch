@@ -28,6 +28,9 @@ class Cell(object):
     def set_target(self):
         self.target = True
 
+    def remove_target(self):
+        self.target = False
+
     def search_cell(self):
         if self.target == False:
             return False
