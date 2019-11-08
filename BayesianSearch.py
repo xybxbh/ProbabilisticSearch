@@ -35,6 +35,27 @@ class BayesianSearch(object):
                 cell.update_belief(cell.fn/(cell.belief[-1]*cell.fn+1-cell.belief[-1]))
                 count += 1
 
+    def one_step_search(self, rule):
+        count = 0
+        (x, y) = (-1, -1)
+        while True:
+            if rule == 1:
+                (x, y) = self.landscape.get_cell_with_highest_belief_dist_factor((x, y))
+            if rule == 2:
+                (x, y) = self.landscape.get_cell_with_highest_p_of_finding_dist_factor((x, y))
+            cell = self.landscape.env[x][y]
+            count += 1
+            if cell.search_cell():
+                return (x, y), count   # ending condition
+            else:
+                for i in range(self.landscape.dim):
+                    for j in range(self.landscape.dim):
+                        if i == x and j == y:
+                            pass    # update (x, y) at last
+                        else:
+                            self.landscape.env[i][j].update_belief(1/(1-cell.belief[-1]*(1-cell.fn)))
+                cell.update_belief(cell.fn/(cell.belief[-1]*cell.fn+1-cell.belief[-1]))
+
 if __name__ == '__main__':
     total_rule1_count = total_rule2_count = 0
     for i in range(100):

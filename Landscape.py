@@ -58,3 +58,92 @@ class Landscape(object):
         index = random.sample(indices, 1)[0]
         return index
 
+    def get_cell_with_highest_belief_dist_factor(self, cell):
+        (x, y) = cell
+        if x == -1 and y == -1:
+            while True:
+                x = random.randint(0, self.dim-1)
+                y = random.randint(0, self.dim-1)
+                if self.env[x][y].type == 'flat':
+                    break
+            return (x, y)
+        (max_x, max_y) = (-1, -1)
+        max_belief = 0
+        max_dist = 0
+        dist_belief_matrix = []
+        for i in range(self.dim):
+            dist_belief_list = []
+            for j in range(self.dim):
+                dist = abs(x-i) + abs(y-j)
+                curr_belief = self.env[i][j].belief[-1] * (1 - pow(dist,2) * 0.01)
+                if curr_belief > max_belief:
+                    max_belief = curr_belief
+                    (max_x, max_y) = (i, j)
+                    max_dist = dist
+                elif curr_belief == max_belief:
+                    if dist < max_dist:
+                        (max_x, max_y) = (i, j)
+                        max_dist = dist
+                dist_belief_list.append(curr_belief)
+            dist_belief_matrix.append(dist_belief_list)
+        neighbor_d = max_dist
+        neighbor_belif = 0
+        (next_x, next_y) = (x, y)
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                if 0 <= x + i <= self.dim - 1 and 0 <= y + j <= self.dim - 1 and (i==0 or j==0):
+                    d = abs(x + i - max_x) + abs(y + j - max_y)
+                    if neighbor_d > d:
+                        neighbor_d = d
+                        neighbor_belif = dist_belief_matrix[x+i][y+j]
+                        (next_x, next_y) = (x+i, y+j)
+                    elif neighbor_d == d:
+                        if neighbor_belif < dist_belief_matrix[x+i][y+j]:
+                            neighbor_belif = dist_belief_matrix[x+i][y+j]
+                            (next_x, next_y) = (x+i, y+j)
+        return (next_x, next_y)
+
+    def get_cell_with_highest_p_of_finding_dist_factor(self, cell):
+        (x, y) = cell
+        if x == -1 and y == -1:
+            while True:
+                x = random.randint(0, self.dim-1)
+                y = random.randint(0, self.dim-1)
+                if self.env[x][y].type == 'flat':
+                    break
+            return (x, y)
+        (max_x, max_y) = (-1, -1)
+        max_belief = 0
+        max_dist = 0
+        dist_belief_matrix = []
+        for i in range(self.dim):
+            dist_belief_list = []
+            for j in range(self.dim):
+                dist = abs(x-i) + abs(y-j)
+                curr_belief = self.env[i][j].belief[-1] * (1-self.env[i][j].fn) * (1 - pow(dist,2) * 0.01)
+                if curr_belief > max_belief:
+                    max_belief = curr_belief
+                    (max_x, max_y) = (i, j)
+                    max_dist = dist
+                elif curr_belief == max_belief:
+                    if dist < max_dist:
+                        (max_x, max_y) = (i, j)
+                        max_dist = dist
+                dist_belief_list.append(curr_belief)
+            dist_belief_matrix.append(dist_belief_list)
+        neighbor_d = max_dist
+        neighbor_belif = 0
+        (next_x, next_y) = (x, y)
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                if 0 <= x + i <= self.dim - 1 and 0 <= y + j <= self.dim - 1 and (i==0 or j==0):
+                    d = abs(x + i - max_x) + abs(y + j - max_y)
+                    if neighbor_d > d:
+                        neighbor_d = d
+                        neighbor_belif = dist_belief_matrix[x+i][y+j]
+                        (next_x, next_y) = (x+i, y+j)
+                    elif neighbor_d == d:
+                        if neighbor_belif < dist_belief_matrix[x+i][y+j]:
+                            neighbor_belif = dist_belief_matrix[x+i][y+j]
+                            (next_x, next_y) = (x+i, y+j)
+        return (next_x, next_y)
