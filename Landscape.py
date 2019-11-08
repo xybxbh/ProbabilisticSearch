@@ -1,5 +1,7 @@
 import random
 from Cell import *
+
+
 class Landscape(object):
     def __init__(self):
         self.dim = 50
@@ -8,6 +10,10 @@ class Landscape(object):
         target_y = random.randint(0, self.dim - 1)
         self.target_index = (target_x, target_y)
         self.env[target_x][target_y].set_target()
+        terrain_list = ['flat', 'hilly', 'forest', 'cave']
+        terrain_list.remove(self.env[target_x][target_y].type)
+        self.tracker = random.choice(terrain_list)
+        self.tracker_history = ''
         
     def gen_landscape(self, p_flat, p_hilly, p_forest, p_cave):
         landscape = [['0' for col in range(self.dim)] for row in range(self.dim)]
@@ -149,6 +155,7 @@ class Landscape(object):
         return (next_x, next_y)
 
     def target_move(self):
+        self.tracker_history = self.tracker
         (target_x, target_y) = self.target_index
         next_location = []
         if target_x - 1 >= 0:
@@ -163,3 +170,66 @@ class Landscape(object):
         self.env[target_x][target_y].remove_target()
         self.env[n_target_x][n_target_y].set_target()
         self.target_index = (n_target_x, n_target_y)
+        terrain_list = ['flat', 'hilly', 'forest', 'cave']
+        terrain_list.remove(self.env[n_target_x][n_target_y].type)
+        self.tracker = random.choice(terrain_list)
+
+    def get_cell_with_highest_belief_moving_target(self):
+        local_belief = [[self.env[i][j].belief[-1] for j in range(self.dim)] for i in range(self.dim)]
+        for i in range(self.dim):
+            for j in range(self.dim):
+                if self.env[i][j].type == self.tracker_history:
+                    valid_neighbor = []
+                    if i - 1 >= 0:
+                        valid_neighbor.append((i - 1, j))
+                    if i + 1 <= self.dim - 1:
+                        valid_neighbor.append((i + 1, j))
+                    if j - 1 >= 0:
+                        valid_neighbor.append((i, j - 1))
+                    if j + 1 <= self.dim - 1:
+                        valid_neighbor.append((i, j + 1))
+                    for k in range(len(valid_neighbor)):
+                        (valid_i, valid_j) = valid_neighbor[k]
+                        if local_belief[valid_i][valid_j] - local_belief[i][j] / len(valid_neighbor) > 0:
+                            local_belief[valid_i][valid_j] -= local_belief[i][j] / len(valid_neighbor)
+        for i in range(self.dim):
+            for j in range(self.dim):
+                if self.env[i][j].type == self.tracker:
+                    local_belief[i][j] = 0
+
+        current_belief = []
+        for i in range(self.dim):
+            for j in range(self.dim):
+                current_belief.append(local_belief[i][j])
+        index = current_belief.index(max(current_belief))
+        return (index // self.dim, index % self.dim)
+
+    def get_cell_with_highest_p_of_finding_moving_target(self):
+        local_belief = [[self.env[i][j].belief[-1] for j in range(self.dim)] for i in range(self.dim)]
+        for i in range(self.dim):
+            for j in range(self.dim):
+                if self.env[i][j].type == self.tracker_history:
+                    valid_neighbor = []
+                    if i - 1 >= 0:
+                        valid_neighbor.append((i - 1, j))
+                    if i + 1 <= self.dim - 1:
+                        valid_neighbor.append((i + 1, j))
+                    if j - 1 >= 0:
+                        valid_neighbor.append((i, j - 1))
+                    if j + 1 <= self.dim - 1:
+                        valid_neighbor.append((i, j + 1))
+                    for k in range(len(valid_neighbor)):
+                        (valid_i, valid_j) = valid_neighbor[k]
+                        if local_belief[valid_i][valid_j] - local_belief[i][j] / len(valid_neighbor) > 0:
+                            local_belief[valid_i][valid_j] -= local_belief[i][j] / len(valid_neighbor)
+        for i in range(self.dim):
+            for j in range(self.dim):
+                if self.env[i][j].type == self.tracker:
+                    local_belief[i][j] = 0
+
+        current_p_find = []
+        for i in range(self.dim):
+            for j in range(self.dim):
+                current_p_find.append(local_belief[i][j] * (1 - self.env[i][j].fn))
+        index = current_p_find.index(max(current_p_find))
+        return (index // self.dim, index % self.dim)
