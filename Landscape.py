@@ -1,5 +1,6 @@
 import random
 from Cell import *
+import numpy as np
 
 
 class Landscape(object):
@@ -233,3 +234,12 @@ class Landscape(object):
                 current_p_find.append(local_belief[i][j] * (1 - self.env[i][j].fn))
         index = current_p_find.index(max(current_p_find))
         return (index // self.dim, index % self.dim)
+
+    def normalize(self):
+        sum_belief = 0
+        for i in range(self.dim):
+            for j in range(self.dim):
+                sum_belief += self.env[i][j].belief[-1]
+        for i in range(self.dim):
+            for j in range(self.dim):
+                self.env[i][j].belief[-1] = self.env[i][j].belief[-1]/sum_belief
