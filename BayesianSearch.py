@@ -29,22 +29,54 @@ class BayesianSearch(object):
                 cell.update_belief(cell.fn/(cell.belief[-1]*cell.fn+1-cell.belief[-1]))
                 count += 1
 
-    def one_step_search(self, rule):
-        count = 0
-        (x, y) = (-1, -1)
+    def base_one_step_search(self, rule):
+        motion_count = 0
+        search_count = 0
+        (x, y) = (0, 0)
         while True:
             if rule == 1:
-                (x, y) = self.landscape.get_cell_with_highest_belief_dist_factor((x, y))
-            if rule == 2:
-                (x, y) = self.landscape.get_cell_with_highest_p_of_finding_dist_factor((x, y))
-            cell = self.landscape.env[x][y]
-            count += 1
+                (next_x, next_y) = self.landscape.get_cell_with_highest_belief()
+            else:
+                (next_x, next_y) = self.landscape.get_cell_with_highest_p_of_finding()
+            search_count += 1
+            motion_count += abs(next_x - x) + abs(next_y - y)
+            action_count = search_count + motion_count
+            cell = self.landscape.env[next_x][next_y]
+            (x, y) = (next_x, next_y)
             if cell.search_cell():
-                return (x, y), count   # ending condition
+                return (next_x, next_y), action_count, motion_count, search_count # ending condition
             else:
                 for i in range(self.landscape.dim):
                     for j in range(self.landscape.dim):
-                        if i == x and j == y:
+                        if i == next_x and j == next_y:
+                            pass    # update (x, y) at last
+                        else:
+                            self.landscape.env[i][j].update_belief(1/(1-cell.belief[-1]*(1-cell.fn)))
+                cell.update_belief(cell.fn/(cell.belief[-1]*cell.fn+1-cell.belief[-1]))
+
+    def one_step_search(self, rule):
+        motion_count = 0
+        search_count = 0
+        if rule == 1:
+            (x, y) = (0, 0)
+        else:
+            (x, y) = self.landscape.get_random_flat()
+        while True:
+            if rule == 1:
+                (next_x, next_y) = self.landscape.get_cell_with_highest_belief_dist_factor((x, y), 0)
+            else:
+                (next_x, next_y) = self.landscape.get_cell_with_highest_p_of_finding_dist_factor((x, y), 0)
+            cell = self.landscape.env[next_x][next_y]
+            search_count += 1
+            motion_count += abs(next_x - x) + abs(next_y - y)
+            action_count = motion_count + search_count
+            (x, y) = (next_x, next_y)
+            if cell.search_cell():
+                return (next_x, next_y), action_count, motion_count, search_count # ending condition
+            else:
+                for i in range(self.landscape.dim):
+                    for j in range(self.landscape.dim):
+                        if i == next_x and j == next_y:
                             pass    # update (x, y) at last
                         else:
                             self.landscape.env[i][j].update_belief(1/(1-cell.belief[-1]*(1-cell.fn)))
@@ -118,21 +150,41 @@ class BayesianSearch(object):
 
 if __name__ == '__main__':
     total_rule1_count = total_rule2_count = 0
-    for i in range(100):
+    total_rule1_count_base = total_rule2_count_base = 0
+    for i in range(10):
         landscape = Landscape()
         bs = BayesianSearch(landscape)
 
         # (x, y), rule1_count = bs.search(1)
-        (x, y), rule1_count = bs.search_moving_target_re(1)
-        print("rule1:", rule1_count)
-        total_rule1_count += rule1_count
+        (x, y), rule1_action_count, rule1_motion_count, rule1_search_count= bs.one_step_search(1)
+        print("rule1:", rule1_action_count)
+        total_rule1_count += rule1_action_count
 
         for i in range(landscape.dim):
             for j in range(landscape.dim):
                 landscape.env[i][j].reset_belief()
+
         # (x, y), rule2_count = bs.search(2)
-        (x, y), rule2_count = bs.search_moving_target_re(2)
-        total_rule2_count += rule2_count
-        print("rule2:", rule2_count)
-    print("aver1:", total_rule1_count/100)
-    print("aver2:", total_rule2_count/100)
+        (x, y), rule2_action_count, rule2_motion_count, rule2_search_count= bs.one_step_search(2)
+        total_rule2_count += rule2_action_count
+        print("rule2:", rule2_action_count)
+
+        for i in range(landscape.dim):
+            for j in range(landscape.dim):
+                landscape.env[i][j].reset_belief()
+
+        (x, y), rule1_action_count_base, rule1_motion_count_base, rule1_search_count_base = bs.base_one_step_search(1)
+        total_rule1_count_base += rule1_action_count_base
+        print("base_rule1:", rule1_action_count_base)
+
+        for i in range(landscape.dim):
+            for j in range(landscape.dim):
+                landscape.env[i][j].reset_belief()
+
+        (x, y), rule2_action_count_base, rule2_motion_count_base, rule2_search_count_base = bs.base_one_step_search(2)
+        total_rule2_count_base += rule2_action_count_base
+        print("base_rule2:", rule2_action_count_base)
+    print("aver1:", total_rule1_count/10)
+    print("aver2:", total_rule2_count/10)
+    print("base_aver1:", total_rule1_count_base/10)
+    print("base_aver2:", total_rule2_count_base/10)

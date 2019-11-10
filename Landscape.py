@@ -1,7 +1,7 @@
 import random
 from Cell import *
 import numpy as np
-
+import math
 
 class Landscape(object):
     def __init__(self):
@@ -66,69 +66,46 @@ class Landscape(object):
         index = random.sample(indices, 1)[0]
         return index
 
-    def get_cell_with_highest_belief_dist_factor(self, cell):
-        (x, y) = cell
-        if x == -1 and y == -1:
-            while True:
-                x = random.randint(0, self.dim-1)
-                y = random.randint(0, self.dim-1)
-                if self.env[x][y].type == 'flat':
-                    break
-            return (x, y)
-        (max_x, max_y) = (-1, -1)
-        max_belief = 0
-        max_dist = 0
-        dist_belief_matrix = []
+    def get_random_flat(self):
         for i in range(self.dim):
-            dist_belief_list = []
             for j in range(self.dim):
-                dist = abs(x-i) + abs(y-j)
-                curr_belief = self.env[i][j].belief[-1] * (1 - pow(dist,2) * 0.01)
-                if curr_belief > max_belief:
-                    max_belief = curr_belief
-                    (max_x, max_y) = (i, j)
-                    max_dist = dist
-                elif curr_belief == max_belief:
-                    if dist < max_dist:
-                        (max_x, max_y) = (i, j)
-                        max_dist = dist
-                dist_belief_list.append(curr_belief)
-            dist_belief_matrix.append(dist_belief_list)
-        neighbor_d = max_dist
-        neighbor_belif = 0
-        (next_x, next_y) = (x, y)
-        for i in range(-1, 2):
-            for j in range(-1, 2):
-                if 0 <= x + i <= self.dim - 1 and 0 <= y + j <= self.dim - 1 and (i==0 or j==0):
-                    d = abs(x + i - max_x) + abs(y + j - max_y)
-                    if neighbor_d > d:
-                        neighbor_d = d
-                        neighbor_belif = dist_belief_matrix[x+i][y+j]
-                        (next_x, next_y) = (x+i, y+j)
-                    elif neighbor_d == d:
-                        if neighbor_belif < dist_belief_matrix[x+i][y+j]:
-                            neighbor_belif = dist_belief_matrix[x+i][y+j]
-                            (next_x, next_y) = (x+i, y+j)
-        return (next_x, next_y)
+                cell = self.env[i][j]
+                if cell.type == 'flat':
+                    return (i, j)
 
-    def get_cell_with_highest_p_of_finding_dist_factor(self, cell):
+    def get_cell_with_highest_belief_dist_factor(self, cell, moving):
         (x, y) = cell
-        if x == -1 and y == -1:
-            while True:
-                x = random.randint(0, self.dim-1)
-                y = random.randint(0, self.dim-1)
-                if self.env[x][y].type == 'flat':
-                    break
-            return (x, y)
-        (max_x, max_y) = (-1, -1)
-        max_belief = 0
+        (max_x, max_y) = (x, y)
+        if moving == 0:
+            max_belief = self.env[x][y].belief[-1]
+        else:
+            max_belief = self.local_belief[x][y]
         max_dist = 0
         dist_belief_matrix = []
         for i in range(self.dim):
             dist_belief_list = []
             for j in range(self.dim):
                 dist = abs(x-i) + abs(y-j)
-                curr_belief = self.env[i][j].belief[-1] * (1-self.env[i][j].fn) * (1 - pow(dist,2) * 0.01)
+                if moving == 0:
+                    # change the distance factor here
+                    dist_factor = (1 - pow(dist,2) * 0.01)
+                    # dist_factor = pow(0.9, dist)
+                    # dist_factor = 1 / (0.1 * dist + 1)
+                    # dist_factor = 1 / (0.01 * pow(dist, 2) + 1)
+                    # dist_factor = 1 / (math.log(dist+1, 10) + 1)
+                    if dist_factor < 0:
+                        dist_factor = 0
+                    curr_belief = self.env[i][j].belief[-1] * dist_factor
+                else:
+                    # change the distance factor here
+                    dist_factor = (1 - pow(dist,2) * 0.01)
+                    # dist_factor = pow(0.9, dist)
+                    # dist_factor = 1 / (0.1 * dist + 1)
+                    # dist_factor = 1 / (0.01 * pow(dist, 2) + 1)
+                    # dist_factor = 1 / (math.log(dist+1, 10) + 1)
+                    if dist_factor < 0:
+                        dist_factor = 0
+                    curr_belief = self.local_belief[i][j] * dist_factor
                 if curr_belief > max_belief:
                     max_belief = curr_belief
                     (max_x, max_y) = (i, j)
@@ -139,22 +116,52 @@ class Landscape(object):
                         max_dist = dist
                 dist_belief_list.append(curr_belief)
             dist_belief_matrix.append(dist_belief_list)
-        neighbor_d = max_dist
-        neighbor_belif = 0
-        (next_x, next_y) = (x, y)
-        for i in range(-1, 2):
-            for j in range(-1, 2):
-                if 0 <= x + i <= self.dim - 1 and 0 <= y + j <= self.dim - 1 and (i==0 or j==0):
-                    d = abs(x + i - max_x) + abs(y + j - max_y)
-                    if neighbor_d > d:
-                        neighbor_d = d
-                        neighbor_belif = dist_belief_matrix[x+i][y+j]
-                        (next_x, next_y) = (x+i, y+j)
-                    elif neighbor_d == d:
-                        if neighbor_belif < dist_belief_matrix[x+i][y+j]:
-                            neighbor_belif = dist_belief_matrix[x+i][y+j]
-                            (next_x, next_y) = (x+i, y+j)
-        return (next_x, next_y)
+        return (max_x, max_y)
+
+    def get_cell_with_highest_p_of_finding_dist_factor(self, cell, moving):
+        (x, y) = cell
+        (max_x, max_y) = (x, y)
+        if moving == 0:
+            max_belief = self.env[x][y].belief[-1]
+        else:
+            max_belief = self.local_belief[x][y]
+        max_dist = 0
+        dist_belief_matrix = []
+        for i in range(self.dim):
+            dist_belief_list = []
+            for j in range(self.dim):
+                dist = abs(x-i) + abs(y-j)
+                if moving == 0:
+                    # change the distance factor here
+                    dist_factor = (1 - pow(dist,2) * 0.01)
+                    # dist_factor = pow(0.9, dist)
+                    # dist_factor = 1 / (0.1 * dist + 1)
+                    # dist_factor = 1 / (0.01 * pow(dist, 2) + 1)
+                    # dist_factor = 1 / (math.log(dist+1, 10) + 1)
+                    if dist_factor < 0:
+                        dist_factor = 0
+                    curr_belief = self.env[i][j].belief[-1] * (1-self.env[i][j].fn) * dist_factor
+                else:
+                    # change the distance factor here
+                    dist_factor = (1 - pow(dist,2) * 0.01)
+                    # dist_factor = pow(0.9, dist)
+                    # dist_factor = 1 / (0.1 * dist + 1)
+                    # dist_factor = 1 / (0.01 * pow(dist, 2) + 1)
+                    # dist_factor = 1 / (math.log(dist+1, 10) + 1)
+                    if dist_factor < 0:
+                        dist_factor = 0
+                    curr_belief = self.local_belief[i][j] * (1-self.env[i][j].fn) * dist_factor
+                if curr_belief > max_belief:
+                    max_belief = curr_belief
+                    (max_x, max_y) = (i, j)
+                    max_dist = dist
+                elif curr_belief == max_belief:
+                    if dist < max_dist:
+                        (max_x, max_y) = (i, j)
+                        max_dist = dist
+                dist_belief_list.append(curr_belief)
+            dist_belief_matrix.append(dist_belief_list)
+        return (max_x, max_y)
 
     def target_move(self):
         self.tracker_history = self.tracker
