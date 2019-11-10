@@ -115,7 +115,6 @@ class BayesianSearch(object):
                 count += 1
                 self.landscape.target_move()
 
-            
 
 if __name__ == '__main__':
     total_rule1_count = total_rule2_count = 0

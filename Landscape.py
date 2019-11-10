@@ -15,6 +15,7 @@ class Landscape(object):
         terrain_list.remove(self.env[target_x][target_y].type)
         self.tracker = random.choice(terrain_list)
         self.tracker_history = ''
+        self.local_belief = [[self.env[i][j].belief[-1] for j in range(self.dim)] for i in range(self.dim)]
         
     def gen_landscape(self, p_flat, p_hilly, p_forest, p_cave):
         landscape = [['0' for col in range(self.dim)] for row in range(self.dim)]
