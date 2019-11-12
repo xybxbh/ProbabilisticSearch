@@ -48,6 +48,7 @@ class Landscape(object):
         index = current_pfind.index(max(current_pfind))
         return (index // self.dim, index % self.dim)
 
+    # unused, too slow
     def get_cell_with_highest_belief_rand(self):
         current_belief = {}
         for i in range(self.dim):
@@ -88,9 +89,9 @@ class Landscape(object):
                 dist = abs(x-i) + abs(y-j)
                 if moving == 0:
                     # change the distance factor here
-                    dist_factor = (1 - pow(dist,2) * 0.01)
+                    # dist_factor = (1 - pow(dist,2) * 0.01)
                     # dist_factor = pow(0.9, dist)
-                    # dist_factor = 1 / (0.1 * dist + 1)
+                    dist_factor = 1 / (0.01 * dist + 1)
                     # dist_factor = 1 / (0.01 * pow(dist, 2) + 1)
                     # dist_factor = 1 / (math.log(dist+1, 10) + 1)
                     if dist_factor < 0:
@@ -98,9 +99,9 @@ class Landscape(object):
                     curr_belief = self.env[i][j].belief[-1] * dist_factor
                 else:
                     # change the distance factor here
-                    dist_factor = (1 - pow(dist,2) * 0.01)
+                    # dist_factor = (1 - pow(dist,2) * 0.01)
                     # dist_factor = pow(0.9, dist)
-                    # dist_factor = 1 / (0.1 * dist + 1)
+                    dist_factor = 1 / (0.01 * dist + 1)
                     # dist_factor = 1 / (0.01 * pow(dist, 2) + 1)
                     # dist_factor = 1 / (math.log(dist+1, 10) + 1)
                     if dist_factor < 0:
@@ -133,9 +134,9 @@ class Landscape(object):
                 dist = abs(x-i) + abs(y-j)
                 if moving == 0:
                     # change the distance factor here
-                    dist_factor = (1 - pow(dist,2) * 0.01)
+                    # dist_factor = (1 - pow(dist,2) * 0.01)
                     # dist_factor = pow(0.9, dist)
-                    # dist_factor = 1 / (0.1 * dist + 1)
+                    dist_factor = 1 / (0.01 * dist + 1)
                     # dist_factor = 1 / (0.01 * pow(dist, 2) + 1)
                     # dist_factor = 1 / (math.log(dist+1, 10) + 1)
                     if dist_factor < 0:
@@ -143,9 +144,9 @@ class Landscape(object):
                     curr_belief = self.env[i][j].belief[-1] * (1-self.env[i][j].fn) * dist_factor
                 else:
                     # change the distance factor here
-                    dist_factor = (1 - pow(dist,2) * 0.01)
+                    # dist_factor = (1 - pow(dist,2) * 0.01)
                     # dist_factor = pow(0.9, dist)
-                    # dist_factor = 1 / (0.1 * dist + 1)
+                    dist_factor = 1 / (0.01 * dist + 1)
                     # dist_factor = 1 / (0.01 * pow(dist, 2) + 1)
                     # dist_factor = 1 / (math.log(dist+1, 10) + 1)
                     if dist_factor < 0:
