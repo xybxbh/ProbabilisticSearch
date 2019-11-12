@@ -191,7 +191,6 @@ class BayesianSearch(object):
                         else:
                             self.landscape.env[i][j].update_belief(1 / (1 - cell.belief[-1] * (1 - cell.fn)))
                 cell.update_belief(cell.fn / (cell.belief[-1] * cell.fn + 1 - cell.belief[-1]))
-                count += 1
                 self.landscape.target_move()
 
     def search_moving_target_onestep(self, rule):
@@ -242,7 +241,6 @@ class BayesianSearch(object):
                         else:
                             self.landscape.env[i][j].update_belief(1 / (1 - cell.belief[-1] * (1 - cell.fn)))
                 cell.update_belief(cell.fn / (cell.belief[-1] * cell.fn + 1 - cell.belief[-1]))
-                count += 1
                 self.landscape.target_move()
 
 
