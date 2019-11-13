@@ -126,6 +126,10 @@ class BayesianSearch(object):
                         for k in range(len(valid_neighbor)):
                             (valid_i, valid_j) = valid_neighbor[k]
                             self.landscape.env[valid_i][valid_j].belief[-1] += temp_belief[i][j] / len(valid_neighbor) # no append
+            for i in range(self.landscape.dim):
+                for j in range(self.landscape.dim):
+                    if self.landscape.env[i][j].type == self.landscape.tracker:
+                        self.landscape.env[i][j].belief[-1] = 0
             self.landscape.normalize()
             if rule == 1:
                 (x, y) = self.landscape.get_cell_with_highest_belief()
@@ -170,6 +174,10 @@ class BayesianSearch(object):
                         for k in range(len(valid_neighbor)):
                             (valid_i, valid_j) = valid_neighbor[k]
                             self.landscape.env[valid_i][valid_j].belief[-1] += temp_belief[i][j] / len(valid_neighbor) # no append
+            for i in range(self.landscape.dim):
+                for j in range(self.landscape.dim):
+                    if self.landscape.env[i][j].type == self.landscape.tracker:
+                        self.landscape.env[i][j].belief[-1] = 0
             self.landscape.normalize()
             if rule == 1:
                 (x, y) = self.landscape.get_cell_with_highest_belief()
@@ -218,6 +226,10 @@ class BayesianSearch(object):
                         for k in range(len(valid_neighbor)):
                             (valid_i, valid_j) = valid_neighbor[k]
                             self.landscape.env[valid_i][valid_j].belief[-1] += temp_belief[i][j] / len(valid_neighbor) # no append
+            for i in range(self.landscape.dim):
+                for j in range(self.landscape.dim):
+                    if self.landscape.env[i][j].type == self.landscape.tracker:
+                        self.landscape.env[i][j].belief[-1] = 0
             self.landscape.normalize()
             if rule == 1:
                 (x, y) = self.landscape.get_cell_with_highest_belief_dist_factor((cur_x, cur_y), 0)
