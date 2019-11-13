@@ -110,6 +110,9 @@ class BayesianSearch(object):
             temp_belief = [[self.landscape.env[i][j].belief[-1] for j in range(self.landscape.dim)] for i in range(self.landscape.dim)]
             for i in range(self.landscape.dim):
                 for j in range(self.landscape.dim):
+                    self.landscape.env[i][j].belief[-1] = 0
+            for i in range(self.landscape.dim):
+                for j in range(self.landscape.dim):
                     if self.landscape.env[i][j].type != self.landscape.tracker_history:
                         valid_neighbor = []
                         if i - 1 >= 0:
@@ -123,10 +126,6 @@ class BayesianSearch(object):
                         for k in range(len(valid_neighbor)):
                             (valid_i, valid_j) = valid_neighbor[k]
                             self.landscape.env[valid_i][valid_j].belief[-1] += temp_belief[i][j] / len(valid_neighbor) # no append
-            for i in range(self.landscape.dim):
-                for j in range(self.landscape.dim):
-                    if self.landscape.env[i][j].type == self.landscape.tracker:
-                        self.landscape.env[i][j].belief[-1] = 0
             self.landscape.normalize()
             if rule == 1:
                 (x, y) = self.landscape.get_cell_with_highest_belief()
@@ -155,6 +154,9 @@ class BayesianSearch(object):
             temp_belief = [[self.landscape.env[i][j].belief[-1] for j in range(self.landscape.dim)] for i in range(self.landscape.dim)]
             for i in range(self.landscape.dim):
                 for j in range(self.landscape.dim):
+                    self.landscape.env[i][j].belief[-1] = 0
+            for i in range(self.landscape.dim):
+                for j in range(self.landscape.dim):
                     if self.landscape.env[i][j].type != self.landscape.tracker_history:
                         valid_neighbor = []
                         if i - 1 >= 0:
@@ -168,10 +170,6 @@ class BayesianSearch(object):
                         for k in range(len(valid_neighbor)):
                             (valid_i, valid_j) = valid_neighbor[k]
                             self.landscape.env[valid_i][valid_j].belief[-1] += temp_belief[i][j] / len(valid_neighbor) # no append
-            for i in range(self.landscape.dim):
-                for j in range(self.landscape.dim):
-                    if self.landscape.env[i][j].type == self.landscape.tracker:
-                        self.landscape.env[i][j].belief[-1] = 0
             self.landscape.normalize()
             if rule == 1:
                 (x, y) = self.landscape.get_cell_with_highest_belief()
@@ -204,6 +202,9 @@ class BayesianSearch(object):
             temp_belief = [[self.landscape.env[i][j].belief[-1] for j in range(self.landscape.dim)] for i in range(self.landscape.dim)]
             for i in range(self.landscape.dim):
                 for j in range(self.landscape.dim):
+                    self.landscape.env[i][j].belief[-1] = 0
+            for i in range(self.landscape.dim):
+                for j in range(self.landscape.dim):
                     if self.landscape.env[i][j].type != self.landscape.tracker_history:
                         valid_neighbor = []
                         if i - 1 >= 0:
@@ -217,10 +218,6 @@ class BayesianSearch(object):
                         for k in range(len(valid_neighbor)):
                             (valid_i, valid_j) = valid_neighbor[k]
                             self.landscape.env[valid_i][valid_j].belief[-1] += temp_belief[i][j] / len(valid_neighbor) # no append
-            for i in range(self.landscape.dim):
-                for j in range(self.landscape.dim):
-                    if self.landscape.env[i][j].type == self.landscape.tracker:
-                        self.landscape.env[i][j].belief[-1] = 0
             self.landscape.normalize()
             if rule == 1:
                 (x, y) = self.landscape.get_cell_with_highest_belief_dist_factor((cur_x, cur_y), 0)
@@ -252,7 +249,7 @@ if __name__ == '__main__':
         bs = BayesianSearch(landscape)
 
         # (x, y), rule1_count = bs.search(1)
-        (x, y), rule1_action_count, rule1_motion_count, rule1_search_count= bs.one_step_search(1)
+        (x, y), rule1_action_count, rule1_motion_count, rule1_search_count= bs.search_moving_target_onestep(1)
         print("rule1:", rule1_action_count)
         total_rule1_count += rule1_action_count
 
@@ -261,7 +258,7 @@ if __name__ == '__main__':
                 landscape.env[i][j].reset_belief()
 
         # (x, y), rule2_count = bs.search(2)
-        (x, y), rule2_action_count, rule2_motion_count, rule2_search_count= bs.one_step_search(2)
+        (x, y), rule2_action_count, rule2_motion_count, rule2_search_count= bs.search_moving_target_onestep(2)
         total_rule2_count += rule2_action_count
         print("rule2:", rule2_action_count)
 
@@ -269,7 +266,7 @@ if __name__ == '__main__':
             for j in range(landscape.dim):
                 landscape.env[i][j].reset_belief()
 
-        (x, y), rule1_action_count_base, rule1_motion_count_base, rule1_search_count_base = bs.base_one_step_search(1)
+        (x, y), rule1_action_count_base, rule1_motion_count_base, rule1_search_count_base = bs.search_moving_target_onestep_base(1)
         total_rule1_count_base += rule1_action_count_base
         print("base_rule1:", rule1_action_count_base)
 
@@ -277,7 +274,7 @@ if __name__ == '__main__':
             for j in range(landscape.dim):
                 landscape.env[i][j].reset_belief()
 
-        (x, y), rule2_action_count_base, rule2_motion_count_base, rule2_search_count_base = bs.base_one_step_search(2)
+        (x, y), rule2_action_count_base, rule2_motion_count_base, rule2_search_count_base = bs.search_moving_target_onestep_base(2)
         total_rule2_count_base += rule2_action_count_base
         print("base_rule2:", rule2_action_count_base)
     print("aver1:", total_rule1_count/100)
